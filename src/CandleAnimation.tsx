@@ -281,8 +281,9 @@ export default function CandleAnimation({
     };
 
     const layoutCandles = (): void => {
-      if (!cakeBg) return;
-      const centerX = window.innerWidth / 2;
+      if (!cakeBg || !app) return;
+      const canvasWidth = app.canvas.width / app.renderer.resolution;
+      const centerX = canvasWidth / 2;
       const centerY = cakeBg.y + cakeBg.height * 0.27;
       const RAD = Math.PI / 180;
       const aOffset = 15;
@@ -303,12 +304,15 @@ export default function CandleAnimation({
       const canvasWidth = app.canvas.width / app.renderer.resolution;
       const canvasHeight = app.canvas.height / app.renderer.resolution;
 
+      // Center everything
       girlBg.x = canvasWidth / 2;
       girlBg.y = canvasHeight / 2.7;
       girlBg.scale.set(0.7 * scale);
+
       cakeBg.x = canvasWidth / 2;
       cakeBg.y = canvasHeight / 1.7;
       cakeBg.scale.set(2 * scale);
+
       layoutCandles();
     };
 
