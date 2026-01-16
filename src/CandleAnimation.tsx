@@ -119,10 +119,13 @@ export default function CandleAnimation({
       const flameBody = new PIXI.Graphics().circle(0, 0, 25).fill(0xffffff);
       blurryTexture = app.renderer.generateTexture(flameBody);
 
-      const flameGlowGradient = new PIXI.FillGradient({ x0: 0, y0: 0, x1: 0, y1: 40 });
-      flameGlowGradient.addColorStop(0, [1, 1, 0.2, 0.5]);
-      flameGlowGradient.addColorStop(1, [1, 1, 0.2, 0]);
-      const flameGlow = new PIXI.Graphics().circle(0, 0, 20).fill(flameGlowGradient);
+      // Create radial gradient for flame glow
+      const flameGlow = new PIXI.Graphics()
+        .circle(0, 0, 20)
+        .fill({
+          color: 0xffff33,
+          alpha: 0.5
+        });
       flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
       // Create candles
