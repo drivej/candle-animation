@@ -1,41 +1,83 @@
-import { useEffect, useRef } from 'react';
-import * as PIXI from 'pixi.js';
 import gsap from 'gsap';
+import * as PIXI from 'pixi.js';
+import { useEffect, useRef } from 'react';
+
+export interface CandleAnimationProps {
+  /** Number of candles to display (default: 9, recommended: 1-25) */
+  numCandles?: number;
+  /** Path to girl image (default: '/girl.png') */
+  girlImage?: string;
+  /** Path to cake image (default: '/cake.png') */
+  cakeImage?: string;
+  /** Path to candle image (default: '/candle.png') */
+  candleImage?: string;
+  /** Background color (default: '#000000', use 'transparent' for overlay) */
+  backgroundColor?: string;
+}
+
+interface PointerState {
+  x: number;
+  y: number;
+  offset: {
+    x: number;
+    y: number;
+  };
+}
+
+interface AnimState {
+  brightness: number;
+}
+
+interface FlameBurstAnim {
+  vector: { x: number; y: number };
+  color: PIXI.Color;
+  fuel: number;
+  burnRate: number;
+  energy: number;
+  fadeRate: number;
+}
 
 /**
  * CandleAnimation - A React component that displays an interactive candle animation
- * 
- * @param {Object} props
- * @param {number} props.numCandles - Number of candles to display (default: 9)
- * @param {string} props.girlImage - Path to girl image
- * @param {string} props.cakeImage - Path to cake image
- * @param {string} props.candleImage - Path to candle image
- * @param {string} props.backgroundColor - Background color (default: '#000000')
+ *
+ * Uses bundled assets by default. Assets are included in the package at:
+ * node_modules/@drivej/candle-animation/assets/
+ *
+ * Copy them to your public folder:
+ * cp node_modules/@drivej/candle-animation/assets/* public/
  */
-export default function CandleAnimation({ 
+export default function CandleAnimation({
   numCandles = 9,
   girlImage = '/girl.png',
-  cakeImage = '/cake.png', 
+  cakeImage = '/cake.png',
   candleImage = '/candle.png',
   backgroundColor = '#000000'
-}) {
-  const containerRef = useRef(null);
-  const appRef = useRef(null);
+}: CandleAnimationProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const appRef = useRef<PIXI.Application | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    let app;
-    let candles = [];
-    let pointer = { x: 0, y: 0, offset: { x: 0, y: 0 } };
+    let app: PIXI.Application | null = null;
+    let isInitialized = false;
+    let isCancelled = false;
+    const candles: Candle[] = [];
+    const pointer: PointerState = { x: 0, y: 0, offset: { x: 0, y: 0 } };
     let allCandlesLit = false;
-    let girlBg, cakeBg, candleBg, blurryTexture, flameGlowTexture;
+    let girlBg: PIXI.Sprite & { anim: AnimState };
+    let cakeBg: PIXI.Sprite;
+    let candleBg: PIXI.Texture;
+    let blurryTexture: PIXI.Texture;
+    let flameGlowTexture: PIXI.Texture;
 
     // Utility function
-    const rand = (n1, n2) => Math.random() * (n2 - n1) + n1;
+    const rand = (n1: number, n2: number): number => Math.random() * (n2 - n1) + n1;
 
     // Initialize PixiJS
     const initPixi = async () => {
+      if (!containerRef.current || isCancelled) return;
+
       app = new PIXI.Application();
       await app.init({
         resizeTo: containerRef.current,
@@ -46,40 +88,40 @@ export default function CandleAnimation({
         resolution: Math.min(window.devicePixelRatio || 1, 2)
       });
 
+      if (isCancelled) return;
+
       containerRef.current.appendChild(app.canvas);
       app.stage.sortableChildren = true;
       appRef.current = app;
 
       // Load assets
-      const girl_img = await PIXI.Assets.load(girlImage);
-      girlBg = new PIXI.Sprite(girl_img);
+      const girl_img = await PIXI.Assets.load<PIXI.Texture>(girlImage);
+      if (isCancelled) return;
+
+      girlBg = Object.assign(new PIXI.Sprite(girl_img), { anim: { brightness: 0 } });
       girlBg.anchor.set(0.5);
-      girlBg.anim = { brightness: 0 };
+      girlBg.tint = 0x000000; // Start completely dark
       app.stage.addChild(girlBg);
 
-      const cake_img = await PIXI.Assets.load(cakeImage);
+      const cake_img = await PIXI.Assets.load<PIXI.Texture>(cakeImage);
+      if (isCancelled) return;
+
       cakeBg = new PIXI.Sprite(cake_img);
       cakeBg.anchor.set(0.5, 0);
       app.stage.addChild(cakeBg);
 
-      const candle_img = await PIXI.Assets.load(candleImage);
+      const candle_img = await PIXI.Assets.load<PIXI.Texture>(candleImage);
+      if (isCancelled) return;
+
       candleBg = candle_img;
 
       // Create shared textures
       const flameBody = new PIXI.Graphics().circle(0, 0, 25).fill(0xffffff);
       blurryTexture = app.renderer.generateTexture(flameBody);
 
-      const flameGlowGradient = new PIXI.FillGradient({
-        type: 'radial',
-        center: { x: 0.5, y: 0.5 },
-        outerCenter: { x: 0.5, y: 0.5 },
-        innerRadius: 0,
-        outerRadius: 0.9,
-        colorStops: [
-          { offset: 0, color: 0xffff33, alpha: 0.5 },
-          { offset: 1, color: 0xffff33, alpha: 0 }
-        ]
-      });
+      const flameGlowGradient = new PIXI.FillGradient({ x0: 0, y0: 0, x1: 0, y1: 40 });
+      flameGlowGradient.addColorStop(0, [1, 1, 0.2, 0.5]);
+      flameGlowGradient.addColorStop(1, [1, 1, 0.2, 0]);
       const flameGlow = new PIXI.Graphics().circle(0, 0, 20).fill(flameGlowGradient);
       flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
@@ -98,12 +140,16 @@ export default function CandleAnimation({
 
       updateLayout();
       app.ticker.add(onTick);
+      isInitialized = true;
     };
 
     // Candle class
     class Candle extends PIXI.Container {
       isLit = false;
-      flameBursts = [];
+      flameBursts: FlameBurst[] = [];
+      flameBurstsContainer: FlameBurstsContainer;
+      flameGlowSprite: FlameGlow;
+      candleBg: PIXI.Sprite;
 
       constructor() {
         super();
@@ -120,7 +166,7 @@ export default function CandleAnimation({
         this.scale.set(0.7);
       }
 
-      onTick(ticker) {
+      onTick(ticker: PIXI.Ticker) {
         const maxParticlesPerCandle = 30;
         const spawnChance = 0.8;
 
@@ -175,6 +221,8 @@ export default function CandleAnimation({
     }
 
     class FlameBurst extends PIXI.Sprite {
+      anim: FlameBurstAnim;
+
       constructor() {
         super(blurryTexture);
         this.alpha = 1;
@@ -202,7 +250,8 @@ export default function CandleAnimation({
       }
     }
 
-    const addCandle = () => {
+    const addCandle = (): Candle => {
+      if (!app) throw new Error('PIXI app not initialized');
       const c = new Candle();
       app.stage.addChild(c);
       candles.push(c);
@@ -214,12 +263,12 @@ export default function CandleAnimation({
       return c;
     };
 
-    const updateGirlBg = () => {
+    const updateGirlBg = (): void => {
       const b = girlBg.anim.brightness * 256;
       girlBg.tint = new PIXI.Color({ r: b, g: b, b: b }).toNumber();
     };
 
-    const layoutCandles = () => {
+    const layoutCandles = (): void => {
       if (!cakeBg) return;
       const centerX = window.innerWidth / 2;
       const centerY = cakeBg.y + cakeBg.height * 0.27;
@@ -237,7 +286,7 @@ export default function CandleAnimation({
       });
     };
 
-    const updateLayout = () => {
+    const updateLayout = (): void => {
       if (!girlBg || !cakeBg) return;
       girlBg.x = window.innerWidth / 2;
       girlBg.y = window.innerHeight / 2.7;
@@ -248,7 +297,7 @@ export default function CandleAnimation({
       layoutCandles();
     };
 
-    const onTick = (ticker) => {
+    const onTick = (ticker: PIXI.Ticker): void => {
       let flameBursts = 0;
       let litCount = 0;
 
@@ -291,14 +340,14 @@ export default function CandleAnimation({
     };
 
     // Mouse tracking
-    const handlePointerMove = (e) => {
+    const handlePointerMove = (e: PointerEvent): void => {
       pointer.x = e.clientX;
       pointer.y = e.clientY;
       pointer.offset.x = e.clientX - window.innerWidth / 2;
       pointer.offset.y = e.clientY - window.innerHeight / 2;
     };
 
-    const handleResize = () => {
+    const handleResize = (): void => {
       updateLayout();
     };
 
@@ -309,10 +358,15 @@ export default function CandleAnimation({
 
     // Cleanup
     return () => {
+      isCancelled = true;
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('resize', handleResize);
-      if (app) {
-        app.destroy(true, { children: true, texture: true, baseTexture: true });
+      if (app && isInitialized) {
+        try {
+          app.destroy(true, { children: true, texture: true });
+        } catch (error) {
+          console.warn('Error destroying PIXI app:', error);
+        }
       }
     };
   }, [numCandles, girlImage, cakeImage, candleImage, backgroundColor]);

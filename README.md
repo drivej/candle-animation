@@ -1,8 +1,8 @@
 # 🕯️ Candle Animation
 
-An interactive birthday candle animation built with PixiJS and React. Features realistic flame particles, GSAP animations, and mouse interaction.
+An interactive birthday candle animation built with **React**, **PixiJS**, and **TypeScript**. Features realistic flame particles, GSAP animations, and mouse interaction with full type safety.
 
-![Candle Animation Demo](https://img.shields.io/badge/React-18+-blue) ![PixiJS](https://img.shields.io/badge/PixiJS-8.0-green) ![License](https://img.shields.io/badge/license-MIT-blue)
+![Candle Animation Demo](https://img.shields.io/badge/React-18+-blue) ![PixiJS](https://img.shields.io/badge/PixiJS-8.0-green) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue) ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## ✨ Features
 
@@ -13,6 +13,8 @@ An interactive birthday candle animation built with PixiJS and React. Features r
 - 🎯 Dynamic candle positioning
 - 🌈 Brightness effects on cake and background
 - 💨 Mouse-reactive flame particles
+- 📘 **Full TypeScript support** with exported types
+- 🎨 Customizable props with sensible defaults
 
 ## 📦 Installation
 
@@ -63,7 +65,7 @@ This expects you've copied the assets to your public folder (see Installation ab
 
 ### With Custom Props
 
-```jsx
+```tsx
 import CandleAnimation from '@drivej/candle-animation';
 
 function App() {
@@ -76,6 +78,26 @@ function App() {
       backgroundColor="#1a1a1a"
     />
   );
+}
+```
+
+### TypeScript Usage
+
+The package exports full TypeScript types:
+
+```tsx
+import CandleAnimation, { CandleAnimationProps } from '@drivej/candle-animation';
+
+const props: CandleAnimationProps = {
+  numCandles: 9,
+  girlImage: '/girl.png',
+  cakeImage: '/cake.png',
+  candleImage: '/candle.png',
+  backgroundColor: '#000000'
+};
+
+function App() {
+  return <CandleAnimation {...props} />;
 }
 ```
 
