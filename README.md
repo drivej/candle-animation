@@ -45,7 +45,11 @@ npm install
 
 ## 🚀 Usage
 
-### Basic Example
+### Basic Example (with default settings)
+
+The component uses sensible defaults:
+- **9 candles** arranged in an ellipse
+- Looks for images at `/girl.png`, `/cake.png`, `/candle.png` in your public folder
 
 ```jsx
 import CandleAnimation from '@drivej/candle-animation';
@@ -54,6 +58,8 @@ function App() {
   return <CandleAnimation />;
 }
 ```
+
+This expects you've copied the assets to your public folder (see Installation above).
 
 ### With Custom Props
 
@@ -95,10 +101,10 @@ Then use them:
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `numCandles` | number | `9` | Number of candles to display |
-| `girlImage` | string | `'/girl.png'` | Path to girl image |
-| `cakeImage` | string | `'/cake.png'` | Path to cake image |
-| `candleImage` | string | `'/candle.png'` | Path to candle image |
+| `numCandles` | number | `9` | Number of candles to display (1-25 recommended) |
+| `girlImage` | string | `'/girl.png'` | Path to girl image (copy from package assets) |
+| `cakeImage` | string | `'/cake.png'` | Path to cake image (copy from package assets) |
+| `candleImage` | string | `'/candle.png'` | Path to candle image (copy from package assets) |
 | `backgroundColor` | string | `'#000000'` | Background color (use `'transparent'` for overlay) |
 
 ## 🎮 Interaction

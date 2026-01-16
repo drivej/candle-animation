@@ -3,13 +3,12 @@ import ReactDOM from 'react-dom/client';
 import CandleAnimation from './src/CandleAnimation.jsx';
 
 function App() {
+  // Using all defaults: 9 candles, looks for images at /assets/
   return (
-    <CandleAnimation 
-      numCandles={9}
+    <CandleAnimation
       girlImage="/assets/girl.png"
       cakeImage="/assets/cake.png"
       candleImage="/assets/candle.png"
-      backgroundColor="#000000"
     />
   );
 }

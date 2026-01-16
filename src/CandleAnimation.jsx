@@ -4,18 +4,24 @@ import gsap from 'gsap';
 
 /**
  * CandleAnimation - A React component that displays an interactive candle animation
- * 
+ *
+ * Uses bundled assets by default. Assets are included in the package at:
+ * node_modules/@drivej/candle-animation/assets/
+ *
+ * Copy them to your public folder:
+ * cp node_modules/@drivej/candle-animation/assets/* public/
+ *
  * @param {Object} props
  * @param {number} props.numCandles - Number of candles to display (default: 9)
- * @param {string} props.girlImage - Path to girl image
- * @param {string} props.cakeImage - Path to cake image
- * @param {string} props.candleImage - Path to candle image
+ * @param {string} props.girlImage - Path to girl image (default: '/girl.png')
+ * @param {string} props.cakeImage - Path to cake image (default: '/cake.png')
+ * @param {string} props.candleImage - Path to candle image (default: '/candle.png')
  * @param {string} props.backgroundColor - Background color (default: '#000000')
  */
-export default function CandleAnimation({ 
+export default function CandleAnimation({
   numCandles = 9,
   girlImage = '/girl.png',
-  cakeImage = '/cake.png', 
+  cakeImage = '/cake.png',
   candleImage = '/candle.png',
   backgroundColor = '#000000'
 }) {
