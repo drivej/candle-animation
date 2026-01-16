@@ -13,6 +13,12 @@ export interface CandleAnimationProps {
   candleImage?: string;
   /** Background color (default: '#000000', use 'transparent' for overlay) */
   backgroundColor?: string;
+  /** Width of the canvas (default: '100%') */
+  width?: string | number;
+  /** Height of the canvas (default: '100vh') */
+  height?: string | number;
+  /** Scale factor for all elements (default: 1) */
+  scale?: number;
 }
 
 interface PointerState {
@@ -51,7 +57,10 @@ export default function CandleAnimation({
   girlImage = '/girl.png',
   cakeImage = '/cake.png',
   candleImage = '/candle.png',
-  backgroundColor = '#000000'
+  backgroundColor = '#000000',
+  width = '100%',
+  height = '100vh',
+  scale = 1
 }: CandleAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
@@ -166,7 +175,7 @@ export default function CandleAnimation({
 
         this.flameGlowSprite.y = -this.candleBg.height;
         this.flameBurstsContainer.y = -this.candleBg.height;
-        this.scale.set(0.7);
+        this.scale.set(0.7 * scale);
       }
 
       onTick(ticker: PIXI.Ticker) {
@@ -290,13 +299,16 @@ export default function CandleAnimation({
     };
 
     const updateLayout = (): void => {
-      if (!girlBg || !cakeBg) return;
-      girlBg.x = window.innerWidth / 2;
-      girlBg.y = window.innerHeight / 2.7;
-      girlBg.scale.set(0.7);
-      cakeBg.x = window.innerWidth / 2;
-      cakeBg.y = window.innerHeight / 1.7;
-      cakeBg.scale.set(2);
+      if (!girlBg || !cakeBg || !app) return;
+      const canvasWidth = app.canvas.width / app.renderer.resolution;
+      const canvasHeight = app.canvas.height / app.renderer.resolution;
+
+      girlBg.x = canvasWidth / 2;
+      girlBg.y = canvasHeight / 2.7;
+      girlBg.scale.set(0.7 * scale);
+      cakeBg.x = canvasWidth / 2;
+      cakeBg.y = canvasHeight / 1.7;
+      cakeBg.scale.set(2 * scale);
       layoutCandles();
     };
 
@@ -372,14 +384,14 @@ export default function CandleAnimation({
         }
       }
     };
-  }, [numCandles, girlImage, cakeImage, candleImage, backgroundColor]);
+  }, [numCandles, girlImage, cakeImage, candleImage, backgroundColor, width, height, scale]);
 
   return (
     <div
       ref={containerRef}
       style={{
-        width: '100%',
-        height: '100vh',
+        width: typeof width === 'number' ? `${width}px` : width,
+        height: typeof height === 'number' ? `${height}px` : height,
         overflow: 'hidden',
         position: 'relative'
       }}

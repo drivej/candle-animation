@@ -9,6 +9,12 @@ export interface CandleAnimationProps {
     candleImage?: string;
     /** Background color (default: '#000000', use 'transparent' for overlay) */
     backgroundColor?: string;
+    /** Width of the canvas (default: '100%') */
+    width?: string | number;
+    /** Height of the canvas (default: '100vh') */
+    height?: string | number;
+    /** Scale factor for all elements (default: 1) */
+    scale?: number;
 }
 /**
  * CandleAnimation - A React component that displays an interactive candle animation
@@ -19,4 +25,4 @@ export interface CandleAnimationProps {
  * Copy them to your public folder:
  * cp node_modules/@drivej/candle-animation/assets/* public/
  */
-export default function CandleAnimation({ numCandles, girlImage, cakeImage, candleImage, backgroundColor }: CandleAnimationProps): import("react/jsx-runtime").JSX.Element;
+export default function CandleAnimation({ numCandles, girlImage, cakeImage, candleImage, backgroundColor, width, height, scale }: CandleAnimationProps): import("react/jsx-runtime").JSX.Element;
