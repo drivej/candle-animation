@@ -3,16 +3,12 @@
 ## 🚀 Publish to GitHub (First Time)
 
 ```bash
-# 1. Create repo on GitHub: https://github.com/new
-#    Name: candle-animation
+# 1. Repo already exists at: https://github.com/drivej/candle-animation
 
 # 2. Push to GitHub
-git init
 git add .
-git commit -m "Initial commit: Candle animation package"
-git branch -M main
-git remote add origin https://github.com/jasoncontento/candle-animation.git
-git push -u origin main
+git commit -m "Setup: Package configuration for npm installation"
+git push
 
 # 3. Create release (optional)
 git tag v1.0.0
@@ -23,16 +19,16 @@ git push origin v1.0.0
 
 ```bash
 # In your other React project
-npm install github:jasoncontento/candle-animation
+npm install github:drivej/candle-animation
 
 # Copy assets
-cp node_modules/@jasoncontento/candle-animation/assets/* public/
+cp node_modules/@drivej/candle-animation/assets/* public/
 ```
 
 ## 💻 Use the Component
 
 ```jsx
-import CandleAnimation from '@jasoncontento/candle-animation';
+import CandleAnimation from '@drivej/candle-animation';
 
 function App() {
   return (
@@ -56,7 +52,7 @@ git commit -m "Update animation"
 git push
 
 # In your other project
-npm update @jasoncontento/candle-animation
+npm update @drivej/candle-animation
 ```
 
 ## 🛠️ Development Commands

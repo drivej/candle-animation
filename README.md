@@ -19,11 +19,11 @@ An interactive birthday candle animation built with PixiJS and React. Features r
 ### Install from GitHub
 
 ```bash
-npm install github:jasoncontento/candle-animation
+npm install github:drivej/candle-animation
 # or
-yarn add github:jasoncontento/candle-animation
+yarn add github:drivej/candle-animation
 # or
-pnpm add github:jasoncontento/candle-animation
+pnpm add github:drivej/candle-animation
 ```
 
 ### Install from package.json
@@ -33,7 +33,7 @@ Add to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@jasoncontento/candle-animation": "github:jasoncontento/candle-animation"
+    "@drivej/candle-animation": "github:drivej/candle-animation"
   }
 }
 ```
@@ -48,7 +48,7 @@ npm install
 ### Basic Example
 
 ```jsx
-import CandleAnimation from '@jasoncontento/candle-animation';
+import CandleAnimation from '@drivej/candle-animation';
 
 function App() {
   return <CandleAnimation />;
@@ -58,11 +58,11 @@ function App() {
 ### With Custom Props
 
 ```jsx
-import CandleAnimation from '@jasoncontento/candle-animation';
+import CandleAnimation from '@drivej/candle-animation';
 
 function App() {
   return (
-    <CandleAnimation 
+    <CandleAnimation
       numCandles={13}
       girlImage="/path/to/girl.png"
       cakeImage="/path/to/cake.png"
@@ -78,7 +78,7 @@ function App() {
 The package includes default assets. You can copy them to your public folder:
 
 ```bash
-cp node_modules/@jasoncontento/candle-animation/assets/* public/assets/
+cp node_modules/@drivej/candle-animation/assets/* public/assets/
 ```
 
 Then use them:
@@ -113,7 +113,7 @@ Then use them:
 ### Clone and Setup
 
 ```bash
-git clone https://github.com/jasoncontento/candle-animation.git
+git clone https://github.com/drivej/candle-animation.git
 cd candle-animation
 npm install
 ```
@@ -132,7 +132,7 @@ npm run build:lib
 
 ## 📄 License
 
-MIT © Jason Contento
+MIT
 
 ## 🙏 Credits
 
