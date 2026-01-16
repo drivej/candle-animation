@@ -9,7 +9,7 @@ git init
 git add .
 git commit -m "Initial commit: Candle animation package"
 git branch -M main
-git remote add origin https://github.com/jasoncontento/candle-animation.git
+git remote add origin https://github.com/drivej/candle-animation.git
 git push -u origin main
 ```
 
@@ -20,7 +20,7 @@ In your other React project, install directly from GitHub:
 ### Option A: Using npm
 
 ```bash
-npm install github:jasoncontento/candle-animation
+npm install github:drivej/candle-animation
 ```
 
 ### Option B: Using package.json
@@ -30,7 +30,7 @@ Add to your `package.json`:
 ```json
 {
   "dependencies": {
-    "@jasoncontento/candle-animation": "github:jasoncontento/candle-animation"
+    "@drivej/candle-animation": "github:drivej/candle-animation"
   }
 }
 ```
@@ -44,13 +44,13 @@ npm install
 
 ```bash
 # Install from a specific branch
-npm install github:jasoncontento/candle-animation#develop
+npm install github:drivej/candle-animation#develop
 
 # Install from a specific tag/release
-npm install github:jasoncontento/candle-animation#v1.0.0
+npm install github:drivej/candle-animation#v1.0.0
 
 # Install from a specific commit
-npm install github:jasoncontento/candle-animation#abc1234
+npm install github:drivej/candle-animation#abc1234
 ```
 
 ## Step 3: Copy Assets to Your Project
@@ -59,18 +59,18 @@ The package includes default images. Copy them to your public folder:
 
 ```bash
 # From your project root
-cp node_modules/@jasoncontento/candle-animation/assets/* public/assets/
+cp node_modules/@drivej/candle-animation/assets/* public/assets/
 ```
 
 Or manually copy:
-- `node_modules/@jasoncontento/candle-animation/assets/girl.png` → `public/assets/girl.png`
-- `node_modules/@jasoncontento/candle-animation/assets/cake.png` → `public/assets/cake.png`
-- `node_modules/@jasoncontento/candle-animation/assets/candle.png` → `public/assets/candle.png`
+- `node_modules/@drivej/candle-animation/assets/girl.png` → `public/assets/girl.png`
+- `node_modules/@drivej/candle-animation/assets/cake.png` → `public/assets/cake.png`
+- `node_modules/@drivej/candle-animation/assets/candle.png` → `public/assets/candle.png`
 
 ## Step 4: Use in Your React App
 
 ```jsx
-import CandleAnimation from '@jasoncontento/candle-animation';
+import CandleAnimation from '@drivej/candle-animation';
 
 function App() {
   return (
@@ -98,10 +98,10 @@ git commit -m "Update animation"
 git push
 
 # In your other project
-npm update @jasoncontento/candle-animation
+npm update @drivej/candle-animation
 # or force reinstall
-npm uninstall @jasoncontento/candle-animation
-npm install github:jasoncontento/candle-animation
+npm uninstall @drivej/candle-animation
+npm install github:drivej/candle-animation
 ```
 
 ## 🎯 Complete Example
@@ -126,7 +126,7 @@ your-app/
 
 ```jsx
 import { useState } from 'react';
-import CandleAnimation from '@jasoncontento/candle-animation';
+import CandleAnimation from '@drivej/candle-animation';
 
 function App() {
   const [numCandles, setNumCandles] = useState(9);
@@ -174,7 +174,7 @@ export default App;
 If your repo is private, use a GitHub personal access token:
 
 ```bash
-npm install git+https://<TOKEN>@github.com/jasoncontento/candle-animation.git
+npm install git+https://<TOKEN>@github.com/drivej/candle-animation.git
 ```
 
 Or add to `.npmrc`:
@@ -194,17 +194,17 @@ git push origin v1.0.0
 
 Then install specific version:
 ```bash
-npm install github:jasoncontento/candle-animation#v1.0.0
+npm install github:drivej/candle-animation#v1.0.0
 ```
 
 ## ✅ Verify Installation
 
 ```bash
 # Check if package is installed
-npm list @jasoncontento/candle-animation
+npm list @drivej/candle-animation
 
 # View package contents
-ls node_modules/@jasoncontento/candle-animation
+ls node_modules/@drivej/candle-animation
 ```
 
 You should see:
