@@ -175,7 +175,8 @@ export default function CandleAnimation({
 
         this.flameGlowSprite.y = -this.candleBg.height;
         this.flameBurstsContainer.y = -this.candleBg.height;
-        this.scale.set(0.7 * scale);
+        // Initial scale - will be updated by updateLayout
+        this.scale.set(0.7);
       }
 
       onTick(ticker: PIXI.Ticker) {
@@ -320,6 +321,11 @@ export default function CandleAnimation({
       cakeBg.x = canvasWidth / 2;
       cakeBg.y = canvasHeight * 0.59; // Proportional to height
       cakeBg.scale.set(2 * scale * autoScale);
+
+      // Update candle scales
+      candles.forEach((c) => {
+        c.scale.set(0.7 * scale * autoScale);
+      });
 
       layoutCandles();
     };
