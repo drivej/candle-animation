@@ -304,14 +304,22 @@ export default function CandleAnimation({
       const canvasWidth = app.canvas.width / app.renderer.resolution;
       const canvasHeight = app.canvas.height / app.renderer.resolution;
 
-      // Center everything
+      // Calculate scale factor based on container size
+      // Use the smaller dimension to ensure everything fits
+      const baseWidth = 1920; // Reference width
+      const baseHeight = 1080; // Reference height
+      const scaleX = canvasWidth / baseWidth;
+      const scaleY = canvasHeight / baseHeight;
+      const autoScale = Math.min(scaleX, scaleY);
+
+      // Center everything with responsive scaling
       girlBg.x = canvasWidth / 2;
-      girlBg.y = canvasHeight / 2.7;
-      girlBg.scale.set(0.7 * scale);
+      girlBg.y = canvasHeight * 0.37; // Proportional to height
+      girlBg.scale.set(0.7 * scale * autoScale);
 
       cakeBg.x = canvasWidth / 2;
-      cakeBg.y = canvasHeight / 1.7;
-      cakeBg.scale.set(2 * scale);
+      cakeBg.y = canvasHeight * 0.59; // Proportional to height
+      cakeBg.scale.set(2 * scale * autoScale);
 
       layoutCandles();
     };
