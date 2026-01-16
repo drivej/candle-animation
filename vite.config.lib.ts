@@ -12,12 +12,15 @@ export default defineConfig({
       fileName: (format) => `candle-animation.${format}.js`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
+          'react/jsx-runtime': 'React.jsxRuntime',
         },
+        // Disable code splitting to prevent chunking
+        inlineDynamicImports: true,
       },
     },
     target: 'esnext',
