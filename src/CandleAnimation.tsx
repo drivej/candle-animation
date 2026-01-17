@@ -94,7 +94,7 @@ export default function CandleAnimation({
       await app.init({
         resizeTo: containerRef.current,
         backgroundAlpha: backgroundColor === 'transparent' ? 0 : 1,
-        backgroundColor: backgroundColor,
+        background: backgroundColor === 'transparent' ? 0x000000 : backgroundColor,
         antialias: true,
         autoDensity: true,
         resolution: Math.min(window.devicePixelRatio || 1, 2)
