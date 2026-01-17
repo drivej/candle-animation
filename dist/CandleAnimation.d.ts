@@ -15,6 +15,8 @@ export interface CandleAnimationProps {
     height?: string | number;
     /** Scale factor for all elements (default: 1) */
     scale?: number;
+    /** Callback triggered when the girl appears and blows out the candles */
+    onComplete?: () => void;
 }
 /**
  * CandleAnimation - A React component that displays an interactive candle animation
@@ -25,4 +27,4 @@ export interface CandleAnimationProps {
  * Copy them to your public folder:
  * cp node_modules/@drivej/candle-animation/assets/* public/
  */
-export default function CandleAnimation({ numCandles, girlImage, cakeImage, candleImage, backgroundColor, width, height, scale }: CandleAnimationProps): import("react/jsx-runtime").JSX.Element;
+export default function CandleAnimation({ numCandles, girlImage, cakeImage, candleImage, backgroundColor, width, height, scale, onComplete }: CandleAnimationProps): import("react/jsx-runtime").JSX.Element;

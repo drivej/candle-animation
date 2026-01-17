@@ -19,6 +19,8 @@ export interface CandleAnimationProps {
   height?: string | number;
   /** Scale factor for all elements (default: 1) */
   scale?: number;
+  /** Callback triggered when the girl appears and blows out the candles */
+  onComplete?: () => void;
 }
 
 interface PointerState {
@@ -60,7 +62,8 @@ export default function CandleAnimation({
   backgroundColor = '#000000',
   width = '100%',
   height = '100vh',
-  scale = 1
+  scale = 1,
+  onComplete
 }: CandleAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
@@ -358,6 +361,11 @@ export default function CandleAnimation({
               c.isLit = false;
             });
             allCandlesLit = false;
+
+            // Trigger the onComplete callback when candles are blown out
+            if (onComplete) {
+              onComplete();
+            }
 
             gsap.to(girlBg.anim, {
               brightness: 0,
