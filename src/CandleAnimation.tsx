@@ -55,7 +55,7 @@ interface FlameBurstAnim {
  * cp node_modules/@drivej/candle-animation/assets/* public/
  */
 export default function CandleAnimation({
-  numCandles = 9,
+  numCandles = 7, //
   girlImage = '/girl.png',
   cakeImage = '/cake.png',
   candleImage = '/candle.png',
@@ -114,6 +114,7 @@ export default function CandleAnimation({
       girlBg.anchor.set(0.5);
       girlBg.tint = 0x000000; // Start completely dark
       app.stage.addChild(girlBg);
+      updateGirlBg();
 
       const cake_img = await PIXI.Assets.load<PIXI.Texture>(cakeImage);
       if (isCancelled) return;
@@ -132,12 +133,10 @@ export default function CandleAnimation({
       blurryTexture = app.renderer.generateTexture(flameBody);
 
       // Create radial gradient for flame glow
-      const flameGlow = new PIXI.Graphics()
-        .circle(0, 0, 20)
-        .fill({
-          color: 0xffff33,
-          alpha: 0.5
-        });
+      const flameGlow = new PIXI.Graphics().circle(0, 0, 20).fill({
+        color: 0xffff33,
+        alpha: 0.5
+      });
       flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
       // Create candles
@@ -290,7 +289,7 @@ export default function CandleAnimation({
       const centerX = canvasWidth / 2;
       const centerY = cakeBg.y + cakeBg.height * 0.27;
       const RAD = Math.PI / 180;
-      const aOffset = 15;
+      const aOffset = 0;
       const step = 360 / candles.length;
       const rX = cakeBg.width * 0.3;
       const rY = cakeBg.height * 0.15;
@@ -318,8 +317,8 @@ export default function CandleAnimation({
 
       // Center everything with responsive scaling
       girlBg.x = canvasWidth / 2;
-      girlBg.y = canvasHeight * 0.37; // Proportional to height
-      girlBg.scale.set(0.7 * scale * autoScale);
+      girlBg.y = canvasHeight * 0.4; // Proportional to height
+      girlBg.scale.set(0.85 * scale * autoScale);
 
       cakeBg.x = canvasWidth / 2;
       cakeBg.y = canvasHeight * 0.59; // Proportional to height
@@ -424,4 +423,3 @@ export default function CandleAnimation({
     />
   );
 }
-
