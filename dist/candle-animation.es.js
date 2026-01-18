@@ -32967,7 +32967,7 @@ function ET({
       if (!h.current || f || (u = new Ku(), await u.init({
         resizeTo: h.current,
         backgroundAlpha: s === "transparent" ? 0 : 1,
-        backgroundColor: s,
+        background: s === "transparent" ? 0 : s,
         antialias: !0,
         autoDensity: !0,
         resolution: Math.min(window.devicePixelRatio || 1, 2)

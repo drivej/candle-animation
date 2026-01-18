@@ -17,11 +17,11 @@
         "default": "./dist/candle-animation.umd.js"
       }
     },
-    "./assets/*": "./assets/*"
+    "./assets/*": "./src/assets/*"
   },
   "files": [
     "dist",
-    "assets",
+    "src/assets",
     "README.md"
   ],
   "scripts": {

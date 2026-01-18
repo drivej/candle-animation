@@ -4,6 +4,9 @@ node_modules/
 # Build outputs
 # dist/ - MUST be committed for GitHub package installation to work
 
+# Demo public folder (assets copied from src/assets for local dev)
+public/
+
 # Logs
 *.log
 npm-debug.log*
