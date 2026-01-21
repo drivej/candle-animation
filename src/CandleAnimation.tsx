@@ -62,7 +62,7 @@ export default function CandleAnimation({
   backgroundColor = '#000000',
   width = '100%',
   height = '100vh',
-  scale = 1,
+  scale = 1.4,
   onComplete
 }: CandleAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -178,7 +178,7 @@ export default function CandleAnimation({
         this.flameGlowSprite.y = -this.candleBg.height;
         this.flameBurstsContainer.y = -this.candleBg.height;
         // Initial scale - will be updated by updateLayout
-        this.scale.set(0.7);
+        // this.scale.set(1);
       }
 
       onTick(ticker: PIXI.Ticker) {
