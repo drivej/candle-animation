@@ -32947,14 +32947,15 @@ vp.extension = {
 };
 L.add(Vm, Xm);
 function ET({
-  numCandles: i = 9,
+  numCandles: i = 7,
+  //
   girlImage: e = "/girl.png",
   cakeImage: t = "/cake.png",
   candleImage: r = "/candle.png",
   backgroundColor: s = "#000000",
   width: n = "100%",
   height: a = "100vh",
-  scale: o = 1,
+  scale: o = 1.4,
   onComplete: l
 }) {
   const h = Yo(null), c = Yo(null);
@@ -32975,7 +32976,7 @@ function ET({
       h.current.appendChild(u.canvas), u.stage.sortableChildren = !0, c.current = u;
       const R = await fr.load(e);
       if (f) return;
-      g = Object.assign(new ot(R), { anim: { brightness: 0 } }), g.anchor.set(0.5), g.tint = 0, u.stage.addChild(g);
+      g = Object.assign(new ot(R), { anim: { brightness: 0 } }), g.anchor.set(0.5), g.tint = 0, u.stage.addChild(g), G();
       const Y = await fr.load(t);
       if (f) return;
       x = new ot(Y), x.anchor.set(0.5, 0), u.stage.addChild(x);
@@ -33002,7 +33003,7 @@ function ET({
       flameGlowSprite;
       candleBg;
       constructor() {
-        super(), this.flameBurstsContainer = new E(), this.flameGlowSprite = new P(), this.candleBg = new ot(y), this.candleBg.anchor.set(0.5, 1), this.addChild(this.candleBg), this.addChild(this.flameGlowSprite), this.addChild(this.flameBurstsContainer), this.flameGlowSprite.y = -this.candleBg.height, this.flameBurstsContainer.y = -this.candleBg.height, this.scale.set(0.7);
+        super(), this.flameBurstsContainer = new E(), this.flameGlowSprite = new P(), this.candleBg = new ot(y), this.candleBg.anchor.set(0.5, 1), this.addChild(this.candleBg), this.addChild(this.flameGlowSprite), this.addChild(this.flameBurstsContainer), this.flameGlowSprite.y = -this.candleBg.height, this.flameBurstsContainer.y = -this.candleBg.height;
       }
       onTick(Y) {
         if (this.isLit && Math.random() < 0.8 && this.flameBursts.length < 30) {
@@ -33059,7 +33060,7 @@ function ET({
       g.tint = new J({ r: R, g: R, b: R }).toNumber();
     }, z = () => {
       if (!x || !u) return;
-      const Y = u.canvas.width / u.renderer.resolution / 2, ue = x.y + x.height * 0.27, ie = Math.PI / 180, ne = 15, K = 360 / m.length, N = x.width * 0.3, xt = x.height * 0.15;
+      const Y = u.canvas.width / u.renderer.resolution / 2, ue = x.y + x.height * 0.27, ie = Math.PI / 180, ne = 0, K = 360 / m.length, N = x.width * 0.3, xt = x.height * 0.15;
       m.forEach((Kt, Ys) => {
         const Zt = ne + K * Ys;
         Kt.x = Y + Math.sin(Zt * ie) * N, Kt.y = ue + Math.cos(Zt * ie) * xt, Kt.zIndex = Kt.y;
@@ -33067,7 +33068,7 @@ function ET({
     }, q = () => {
       if (!g || !x || !u) return;
       const R = u.canvas.width / u.renderer.resolution, Y = u.canvas.height / u.renderer.resolution, ue = 1920, ie = 1080, ne = R / ue, K = Y / ie, N = Math.min(ne, K);
-      g.x = R / 2, g.y = Y * 0.37, g.scale.set(0.7 * o * N), x.x = R / 2, x.y = Y * 0.59, x.scale.set(2 * o * N), m.forEach((xt) => {
+      g.x = R / 2, g.y = Y * 0.4, g.scale.set(0.85 * o * N), x.x = R / 2, x.y = Y * 0.59, x.scale.set(2 * o * N), m.forEach((xt) => {
         xt.scale.set(0.7 * o * N);
       }), z();
     }, M = (R) => {
