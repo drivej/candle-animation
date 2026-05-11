@@ -250,6 +250,7 @@ export default function CandleAnimation({
       flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
       // Create candles
+      numCandles = ~~(app!.canvas.width / 250);
       for (let i = 0; i < numCandles; i++) {
         addCandle();
       }
@@ -302,9 +303,16 @@ export default function CandleAnimation({
         c.y = centerY + Math.cos(a * RAD) * rY;
         c.zIndex = c.y;
 
-        const sp = (app!.canvas.width / (candles.length + 1));
-        c.x = (sp) + (sp * i);//
+        const sp = app!.canvas.width / (candles.length + 1);
+        c.x = sp + sp * i; //
         c.y = cakeBg.y + cakeBg.height * 0.47;
+      });
+
+      const sp = app!.canvas.width / (candles.length + 1);
+
+      candles.forEach((c, i) => {
+        c.x = sp + sp * i; //
+        c.y = app!.canvas.height + 40;
       });
     };
 
@@ -322,9 +330,10 @@ export default function CandleAnimation({
       const autoScale = Math.min(scaleX, scaleY);
 
       // Center everything with responsive scaling
+      girlBg.anchor.set(0.5, 1);
       girlBg.x = canvasWidth / 2;
-      girlBg.y = canvasHeight * 0.4; // Proportional to height
-      girlBg.scale.set(0.85 * scale * autoScale);
+      girlBg.y = canvasHeight; // * 0.4; // Proportional to height
+      girlBg.scale.set(1 * scale * autoScale);
 
       cakeBg.x = canvasWidth / 2;
       cakeBg.y = canvasHeight * 0.75; // Proportional to height
