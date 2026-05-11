@@ -250,7 +250,7 @@ export default function CandleAnimation({
       flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
       // Create candles
-      numCandles = ~~(app!.canvas.width / 250);
+      numCandles = Math.max(1, ~~(app!.canvas.width / 250));
       for (let i = 0; i < numCandles; i++) {
         addCandle();
       }

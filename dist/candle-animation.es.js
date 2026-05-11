@@ -33044,7 +33044,7 @@ function IT({
         color: 16777011,
         alpha: 0.5
       });
-      T = u.renderer.generateTexture(j), i = ~~(u.canvas.width / 250);
+      T = u.renderer.generateTexture(j), i = Math.max(1, ~~(u.canvas.width / 250));
       for (let N = 0; N < i; N++)
         w();
       setTimeout(() => {
