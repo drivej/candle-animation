@@ -2,6 +2,7 @@ import gsap from 'gsap';
 import * as PIXI from 'pixi.js';
 import { useEffect, useRef } from 'react';
 
+const rand = (n1: number, n2: number): number => Math.random() * (n2 - n1) + n1;
 export interface CandleAnimationProps {
   /** Number of candles to display (default: 9, recommended: 1-25) */
   numCandles?: number;
@@ -45,6 +46,115 @@ interface FlameBurstAnim {
   fadeRate: number;
 }
 
+class Candle extends PIXI.Container {
+  isLit = false;
+  flameBursts: FlameBurst[] = [];
+  flameBurstsContainer: FlameBurstsContainer;
+  flameGlowSprite: FlameGlow;
+  candleBg: PIXI.Sprite;
+  blurryTexture: PIXI.Texture;
+
+  constructor({ candleBg, flameGlowTexture, blurryTexture }: { candleBg: PIXI.Texture; flameGlowTexture: PIXI.Texture; blurryTexture: PIXI.Texture }) {
+    super();
+    this.flameBurstsContainer = new FlameBurstsContainer();
+    this.flameGlowSprite = new FlameGlow(flameGlowTexture);
+    this.candleBg = new PIXI.Sprite(candleBg);
+    this.candleBg.anchor.set(0.5, 1);
+    this.addChild(this.candleBg);
+    this.addChild(this.flameGlowSprite);
+    this.addChild(this.flameBurstsContainer);
+    this.blurryTexture = blurryTexture;
+
+    this.flameGlowSprite.y = -this.candleBg.height;
+    this.flameBurstsContainer.y = -this.candleBg.height;
+    // Initial scale - will be updated by updateLayout
+    this.scale.set(4);
+  }
+
+  onTick(ticker: PIXI.Ticker, pointer: PointerState) {
+    const maxParticlesPerCandle = 30;
+    const spawnChance = 0.8;
+
+    if (this.isLit && Math.random() < spawnChance && this.flameBursts.length < maxParticlesPerCandle) {
+      const f = new FlameBurst(this.blurryTexture);
+      this.flameBurstsContainer.addChild(f);
+      this.flameBursts.push(f);
+    }
+
+    this.flameGlowSprite.alpha = this.flameBursts.length / 40;
+    this.flameGlowSprite.scale.set(rand(1.8, 2.2));
+
+    const brightness = 256 * Math.max(0.2, Math.min(1, this.flameBursts.length / 20));
+    this.candleBg.tint = new PIXI.Color({ r: brightness, g: brightness, b: brightness }).toNumber();
+
+    for (let i = this.flameBursts.length - 1; i >= 0; i--) {
+      const p = this.flameBursts[i];
+
+      if (p.anim.energy <= 0 && p.anim.fuel <= 0) {
+        this.flameBurstsContainer.removeChild(p);
+        p.destroy();
+        this.flameBursts.splice(i, 1);
+        continue;
+      }
+
+      if (!p || !p?.scale?.x) continue;
+
+      if (p.anim.fuel > 0) {
+        p.anim.energy += p.anim.burnRate * ticker.deltaTime;
+        p.anim.fuel -= p.anim.burnRate * ticker.deltaTime;
+      }
+
+      p.anim.energy -= p.anim.fadeRate * ticker.deltaTime;
+      p.scale.x = p.anim.energy * 0.07;
+      p.scale.y = p.anim.energy * 0.1;
+      p.x += p.anim.vector.x - pointer.offset.x * 0.002;
+      p.y += p.anim.vector.y;
+      p.anim.color.setValue([p.anim.color.red, p.anim.color.green, p.anim.color.blue - 0.03]);
+      p.tint = p.anim.color.toNumber();
+    }
+  }
+}
+
+class FlameGlow extends PIXI.Sprite {
+  constructor(flameGlowTexture: PIXI.Texture) {
+    super(flameGlowTexture);
+    this.filters = [new PIXI.BlurFilter({ strength: 36, quality: 8 })];
+    this.anchor.set(0.5);
+    this.scale.set(2);
+    this.alpha = 0.5;
+  }
+}
+
+class FlameBurst extends PIXI.Sprite {
+  anim: FlameBurstAnim;
+
+  constructor(blurryTexture: PIXI.Texture) {
+    super(blurryTexture);
+    this.alpha = 1;
+    this.anchor.set(0.5);
+    this.anim = {
+      vector: {
+        x: rand(-0.2, 0.2),
+        y: rand(-1.5, -0.8)
+      },
+      color: new PIXI.Color([1, 1, 1]),
+      fuel: rand(5, 6),
+      burnRate: 1,
+      energy: 1,
+      fadeRate: rand(0.2, 0.3)
+    };
+    this.tint = this.anim.color.toNumber();
+  }
+}
+
+class FlameBurstsContainer extends PIXI.Container {
+  constructor() {
+    super();
+    this.filters = [new PIXI.BlurFilter({ strength: 0.5 })];
+    this.alpha = 0.8;
+  }
+}
+
 /**
  * CandleAnimation - A React component that displays an interactive candle animation
  *
@@ -84,7 +194,6 @@ export default function CandleAnimation({
     let flameGlowTexture: PIXI.Texture;
 
     // Utility function
-    const rand = (n1: number, n2: number): number => Math.random() * (n2 - n1) + n1;
 
     // Initialize PixiJS
     const initPixi = async () => {
@@ -121,6 +230,7 @@ export default function CandleAnimation({
 
       cakeBg = new PIXI.Sprite(cake_img);
       cakeBg.anchor.set(0.5, 0);
+      cakeBg.visible = false;
       app.stage.addChild(cakeBg);
 
       const candle_img = await PIXI.Assets.load<PIXI.Texture>(candleImage);
@@ -157,117 +267,9 @@ export default function CandleAnimation({
       isInitialized = true;
     };
 
-    // Candle class
-    class Candle extends PIXI.Container {
-      isLit = false;
-      flameBursts: FlameBurst[] = [];
-      flameBurstsContainer: FlameBurstsContainer;
-      flameGlowSprite: FlameGlow;
-      candleBg: PIXI.Sprite;
-
-      constructor() {
-        super();
-        this.flameBurstsContainer = new FlameBurstsContainer();
-        this.flameGlowSprite = new FlameGlow();
-        this.candleBg = new PIXI.Sprite(candleBg);
-        this.candleBg.anchor.set(0.5, 1);
-        this.addChild(this.candleBg);
-        this.addChild(this.flameGlowSprite);
-        this.addChild(this.flameBurstsContainer);
-
-        this.flameGlowSprite.y = -this.candleBg.height;
-        this.flameBurstsContainer.y = -this.candleBg.height;
-        // Initial scale - will be updated by updateLayout
-        // this.scale.set(1);
-      }
-
-      onTick(ticker: PIXI.Ticker) {
-        const maxParticlesPerCandle = 30;
-        const spawnChance = 0.8;
-
-        if (this.isLit && Math.random() < spawnChance && this.flameBursts.length < maxParticlesPerCandle) {
-          const f = new FlameBurst();
-          this.flameBurstsContainer.addChild(f);
-          this.flameBursts.push(f);
-        }
-
-        this.flameGlowSprite.alpha = this.flameBursts.length / 40;
-        this.flameGlowSprite.scale.set(rand(1.8, 2.2));
-
-        const brightness = 256 * Math.max(0.2, Math.min(1, this.flameBursts.length / 20));
-        this.candleBg.tint = new PIXI.Color({ r: brightness, g: brightness, b: brightness }).toNumber();
-
-        for (let i = this.flameBursts.length - 1; i >= 0; i--) {
-          const p = this.flameBursts[i];
-
-          if (p.anim.energy <= 0 && p.anim.fuel <= 0) {
-            this.flameBurstsContainer.removeChild(p);
-            p.destroy();
-            this.flameBursts.splice(i, 1);
-            continue;
-          }
-
-          if (!p || !p?.scale?.x) continue;
-
-          if (p.anim.fuel > 0) {
-            p.anim.energy += p.anim.burnRate * ticker.deltaTime;
-            p.anim.fuel -= p.anim.burnRate * ticker.deltaTime;
-          }
-
-          p.anim.energy -= p.anim.fadeRate * ticker.deltaTime;
-          p.scale.x = p.anim.energy * 0.07;
-          p.scale.y = p.anim.energy * 0.1;
-          p.x += p.anim.vector.x - pointer.offset.x * 0.002;
-          p.y += p.anim.vector.y;
-          p.anim.color.setValue([p.anim.color.red, p.anim.color.green, p.anim.color.blue - 0.03]);
-          p.tint = p.anim.color.toNumber();
-        }
-      }
-    }
-
-    class FlameGlow extends PIXI.Sprite {
-      constructor() {
-        super(flameGlowTexture);
-        this.filters = [new PIXI.BlurFilter({ strength: 36, quality: 8 })];
-        this.anchor.set(0.5);
-        this.scale.set(2);
-        this.alpha = 0.5;
-      }
-    }
-
-    class FlameBurst extends PIXI.Sprite {
-      anim: FlameBurstAnim;
-
-      constructor() {
-        super(blurryTexture);
-        this.alpha = 1;
-        this.anchor.set(0.5);
-        this.anim = {
-          vector: {
-            x: rand(-0.2, 0.2),
-            y: rand(-1.5, -0.8)
-          },
-          color: new PIXI.Color([1, 1, 1]),
-          fuel: rand(5, 6),
-          burnRate: 1,
-          energy: 1,
-          fadeRate: rand(0.2, 0.3)
-        };
-        this.tint = this.anim.color.toNumber();
-      }
-    }
-
-    class FlameBurstsContainer extends PIXI.Container {
-      constructor() {
-        super();
-        this.filters = [new PIXI.BlurFilter({ strength: 0.5 })];
-        this.alpha = 0.8;
-      }
-    }
-
     const addCandle = (): Candle => {
       if (!app) throw new Error('PIXI app not initialized');
-      const c = new Candle();
+      const c = new Candle({ blurryTexture, candleBg, flameGlowTexture });
       app.stage.addChild(c);
       candles.push(c);
       c.interactive = true;
@@ -299,6 +301,10 @@ export default function CandleAnimation({
         c.x = centerX + Math.sin(a * RAD) * rX;
         c.y = centerY + Math.cos(a * RAD) * rY;
         c.zIndex = c.y;
+
+        const sp = (app!.canvas.width / (candles.length + 1));
+        c.x = (sp) + (sp * i);//
+        c.y = cakeBg.y + cakeBg.height * 0.47;
       });
     };
 
@@ -321,12 +327,13 @@ export default function CandleAnimation({
       girlBg.scale.set(0.85 * scale * autoScale);
 
       cakeBg.x = canvasWidth / 2;
-      cakeBg.y = canvasHeight * 0.59; // Proportional to height
+      cakeBg.y = canvasHeight * 0.75; // Proportional to height
       cakeBg.scale.set(2 * scale * autoScale);
 
       // Update candle scales
       candles.forEach((c) => {
-        c.scale.set(0.7 * scale * autoScale);
+        // c.scale.set(0.7 * scale * autoScale);
+        c.scale.set(1);
       });
 
       layoutCandles();
@@ -337,7 +344,7 @@ export default function CandleAnimation({
       let litCount = 0;
 
       candles.forEach((c) => {
-        c.onTick(ticker);
+        c.onTick(ticker, pointer);
         flameBursts += c.flameBursts.length;
         litCount += c.isLit ? 1 : 0;
       });
@@ -349,7 +356,6 @@ export default function CandleAnimation({
 
       if (litCount === candles.length && !allCandlesLit) {
         allCandlesLit = true;
-
         gsap.to(girlBg.anim, {
           brightness: 1,
           duration: 2,
