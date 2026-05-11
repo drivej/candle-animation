@@ -310,10 +310,15 @@ export default function CandleAnimation({
 
       const sp = app!.canvas.width / (candles.length + 1);
 
-      candles.forEach((c, i) => {
-        c.x = sp + sp * i; //
-        c.y = app!.canvas.height + 40;
-      });
+      if (candles.length === 1) {
+        candles[0].x = centerX;
+        candles[0].y = app!.canvas.height + 40;
+      } else {
+        candles.forEach((c, i) => {
+          c.x = sp + sp * i; //
+          c.y = app!.canvas.height + 40;
+        });
+      }
     };
 
     const updateLayout = (): void => {

@@ -33069,7 +33069,7 @@ function IT({
         _e.x = It + It * ye, _e.y = x.y + x.height * 0.47;
       });
       const ve = u.canvas.width / (m.length + 1);
-      m.forEach((_e, ye) => {
+      m.length === 1 ? (m[0].x = W, m[0].y = u.canvas.height + 40) : m.forEach((_e, ye) => {
         _e.x = ve + ve * ye, _e.y = u.canvas.height + 40;
       });
     }, A = () => {
