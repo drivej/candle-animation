@@ -375,43 +375,20 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
         t1.to(girlBg.anim, { brightness: 1, duration: 1, ease: 'power2.out', onUpdate: updateGirlBg });
 
         // animate wind to blow out candles
-        t1.to(wind, { current: 3, duration: 0.3, ease: 'power2.out' }, '-=0.5');
+        t1.to(wind, { current: 4, duration: 0.1, ease: 'quad.out' }, '-=0.5');
 
         t1.call(() => {
           candlesRef.current.forEach((c) => (c.isLit = false));
           allCandlesLit = false;
           litCount = 0;
-          wind.current = 0; // Reset wind after blowing out candles
         });
 
         t1.to(girlBg.anim, { brightness: 0, duration: 1, ease: 'power2.out', onUpdate: updateGirlBg });
 
-        t1.call(() => onComplete?.());
-
-        // gsap.to(girlBg.anim, {
-        //   brightness: 1,
-        //   duration: 2,
-        //   ease: 'power2.out',
-        //   onUpdate: updateGirlBg,
-        //   onComplete: () => {
-        //     candlesRef.current.forEach((c) => {
-        //       c.isLit = false;
-        //     });
-        //     allCandlesLit = false;
-
-        //     // Trigger the onComplete callback when candles are blown out
-        //     if (onComplete) {
-        //       onComplete();
-        //     }
-
-        //     gsap.to(girlBg.anim, {
-        //       brightness: 0,
-        //       duration: 1,
-        //       ease: 'power2.out',
-        //       onUpdate: updateGirlBg
-        //     });
-        //   }
-        // });
+        t1.call(() => {
+          wind.current = 0;
+          onComplete?.();
+        });
       } else if (litCount < candlesRef.current.length && allCandlesLit) {
         allCandlesLit = false;
       }
