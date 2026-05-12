@@ -33072,9 +33072,11 @@ function IT({ numCandles: i = 7, girlImage: e = "/girl.png", cakeImage: t = "/ca
       if (b && (b.tint = new K({ r: N, g: N, b: N }).toNumber()), I === c.current.length && !x) {
         x = !0;
         const E = Zu.timeline();
-        E.to(y.anim, { brightness: 1, duration: 1, ease: "power2.out", onUpdate: S }), E.to(f, { current: 3, duration: 0.3, ease: "power2.out" }, "-=0.5"), E.call(() => {
-          c.current.forEach((B) => B.isLit = !1), x = !1, I = 0, f.current = 0;
-        }), E.to(y.anim, { brightness: 0, duration: 1, ease: "power2.out", onUpdate: S }), E.call(() => l?.());
+        E.to(y.anim, { brightness: 1, duration: 1, ease: "power2.out", onUpdate: S }), E.to(f, { current: 4, duration: 0.1, ease: "quad.out" }, "-=0.5"), E.call(() => {
+          c.current.forEach((B) => B.isLit = !1), x = !1, I = 0;
+        }), E.to(y.anim, { brightness: 0, duration: 1, ease: "power2.out", onUpdate: S }), E.call(() => {
+          f.current = 0, l?.();
+        });
       } else I < c.current.length && x && (x = !1);
     }, A = (R) => {
       g.x = R.clientX, g.y = R.clientY, g.offset.x = R.clientX - window.innerWidth / 2, g.offset.y = R.clientY - window.innerHeight / 2;
