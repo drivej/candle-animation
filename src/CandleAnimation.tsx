@@ -287,37 +287,29 @@ export default function CandleAnimation({
       girlBg.tint = new PIXI.Color({ r: b, g: b, b: b }).toNumber();
     };
 
-    const layoutCandles = (): void => {
-      if (!cakeBg || !app) return;
-      /*
-      const canvasWidth = app.canvas.width / app.renderer.resolution;
-      const centerX = canvasWidth / 2;
-      const centerY = cakeBg.y + cakeBg.height * 0.27;
-      const RAD = Math.PI / 180;
-      const aOffset = 0;
-      const step = 360 / candles.length;
-      const rX = cakeBg.width * 0.3;
-      const rY = cakeBg.height * 0.15;
+    // const layoutCandles = (): void => {
+    //   if (!cakeBg || !app) return;
 
-      candles.forEach((c, i) => {
-        const a = aOffset + step * i;
-        c.x = centerX + Math.sin(a * RAD) * rX;
-        c.y = centerY + Math.cos(a * RAD) * rY;
-        c.zIndex = c.y;
+    //   const canvasWidth = app.canvas.width / app.renderer.resolution;
+    //   const centerX = canvasWidth / 2;
+    //   const centerY = cakeBg.y + cakeBg.height * 0.27;
+    //   const RAD = Math.PI / 180;
+    //   const aOffset = 0;
+    //   const step = 360 / candles.length;
+    //   const rX = cakeBg.width * 0.3;
+    //   const rY = cakeBg.height * 0.15;
 
-        const sp = app!.canvas.width / (candles.length + 1);
-        c.x = sp + sp * i; //
-        c.y = cakeBg.y + cakeBg.height * 0.47;
-      });
-      */
+    //   candles.forEach((c, i) => {
+    //     const a = aOffset + step * i;
+    //     c.x = centerX + Math.sin(a * RAD) * rX;
+    //     c.y = centerY + Math.cos(a * RAD) * rY;
+    //     c.zIndex = c.y;
 
-      // const sp = app!.canvas.width / (candles.length + 1);
-
-      // candles.forEach((c, i) => {
-      //   c.x = (sp) + (sp * i); //
-      //   c.y = app!.canvas.height * 0.8;//app!.canvas.height; // * 0.5; // + 40;
-      // });
-    };
+    //     const sp = app!.canvas.width / (candles.length + 1);
+    //     c.x = sp + sp * i; //
+    //     c.y = cakeBg.y + cakeBg.height * 0.47;
+    //   });
+    // };
 
     const updateLayout = (): void => {
       if (!girlBg || !cakeBg || !app) return;
