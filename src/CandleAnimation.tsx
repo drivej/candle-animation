@@ -68,7 +68,8 @@ class Candle extends PIXI.Container {
     this.flameGlowSprite.y = -this.candleBg.height;
     this.flameBurstsContainer.y = -this.candleBg.height;
     // Initial scale - will be updated by updateLayout
-    this.scale.set(4);
+    // this.scale.set(4);
+    // this.pivot.set(0.5, 0.5);
   }
 
   onTick(ticker: PIXI.Ticker, pointer: PointerState) {
@@ -250,7 +251,7 @@ export default function CandleAnimation({
       flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
       // Create candles
-      numCandles = Math.max(3, ~~(app!.canvas.width / 250));
+      numCandles = ~~(app!.canvas.width / 250);
       for (let i = 0; i < numCandles; i++) {
         addCandle();
       }
@@ -288,6 +289,7 @@ export default function CandleAnimation({
 
     const layoutCandles = (): void => {
       if (!cakeBg || !app) return;
+      /*
       const canvasWidth = app.canvas.width / app.renderer.resolution;
       const centerX = canvasWidth / 2;
       const centerY = cakeBg.y + cakeBg.height * 0.27;
@@ -307,18 +309,14 @@ export default function CandleAnimation({
         c.x = sp + sp * i; //
         c.y = cakeBg.y + cakeBg.height * 0.47;
       });
+      */
 
-      const sp = app!.canvas.width / (candles.length + 1);
+      // const sp = app!.canvas.width / (candles.length + 1);
 
-      if (candles.length === 1) {
-        candles[0].x = centerX;
-        candles[0].y = app!.canvas.height + 40;
-      } else {
-        candles.forEach((c, i) => {
-          c.x = sp + sp * i; //
-          c.y = app!.canvas.height + 40;
-        });
-      }
+      // candles.forEach((c, i) => {
+      //   c.x = (sp) + (sp * i); //
+      //   c.y = app!.canvas.height * 0.8;//app!.canvas.height; // * 0.5; // + 40;
+      // });
     };
 
     const updateLayout = (): void => {
@@ -335,22 +333,36 @@ export default function CandleAnimation({
       const autoScale = Math.min(scaleX, scaleY);
 
       // Center everything with responsive scaling
-      girlBg.anchor.set(0.5, 1);
+      girlBg.anchor.set(0.5, 0.5);
       girlBg.x = canvasWidth / 2;
-      girlBg.y = canvasHeight; // * 0.4; // Proportional to height
-      girlBg.scale.set(1 * scale * autoScale);
+      girlBg.y = canvasHeight * 0.5; // * 0.4; // Proportional to height
+      // girlBg.scale.set(1 * scale * autoScale);
+      girlBg.scale.set(1 * 1024 / canvasHeight);
 
       cakeBg.x = canvasWidth / 2;
       cakeBg.y = canvasHeight * 0.75; // Proportional to height
       cakeBg.scale.set(2 * scale * autoScale);
 
+      const sp = app!.canvas.width / (candles.length + 1);
+
+
       // Update candle scales
-      candles.forEach((c) => {
+      candles.forEach((c, i) => {
         // c.scale.set(0.7 * scale * autoScale);
-        c.scale.set(1);
+        // c.scale.set(1);
+        const b = c.getLocalBounds();
+        // console.log(b.width, b.height, canvasHeight, (0.5 * canvasHeight) / b.height);
+        c.scale.set((0.6 * canvasHeight) / b.height);
+        c.x = (sp) + (sp * i); //
+        const b2 = c.getBounds();
+        c.y = app!.canvas.height + (b2.height * 0.2);//app!.canvas.height; // * 0.5; // + 40;
+        // console.log(c.getBounds());
+        // c.x = 50;
+        // c.y = 50;
+
       });
 
-      layoutCandles();
+      // layoutCandles();
     };
 
     const onTick = (ticker: PIXI.Ticker): void => {
