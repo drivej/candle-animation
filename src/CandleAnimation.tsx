@@ -72,7 +72,7 @@ class Candle extends PIXI.Container {
     // this.pivot.set(0.5, 0.5);
   }
 
-  onTick(ticker: PIXI.Ticker, pointer: PointerState) {
+  onTick(ticker: PIXI.Ticker, pointer: PointerState, wind = 0) {
     const maxParticlesPerCandle = 30;
     const spawnChance = 0.8;
 
@@ -108,7 +108,7 @@ class Candle extends PIXI.Container {
       p.anim.energy -= p.anim.fadeRate * ticker.deltaTime;
       p.scale.x = p.anim.energy * 0.07;
       p.scale.y = p.anim.energy * 0.1;
-      p.x += p.anim.vector.x - pointer.offset.x * 0.002;
+      p.x += p.anim.vector.x - (wind + pointer.offset.x * 0.002);
       p.y += p.anim.vector.y;
       p.anim.color.setValue([p.anim.color.red, p.anim.color.green, p.anim.color.blue - 0.03]);
       p.tint = p.anim.color.toNumber();
@@ -176,6 +176,7 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
   }>({ candleBg: null, blurryTexture: null, flameGlowTexture: null });
   // const {width:windowWidth} = useWindowSize();
 
+  const wind = useRef(0);
   // Initialize PIXI app only once
   useEffect(() => {
     if (!containerRef.current) return;
@@ -253,7 +254,7 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
         if (i === -1 && candlesRef.current.length > 0) {
           candlesRef.current[Math.floor(Math.random() * candlesRef.current.length)].isLit = true;
         }
-      }, 3000);
+      }, 1000);
 
       // This will create the initial candles based on canvas width
       handleResize();
@@ -262,10 +263,10 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
 
       app.stage.eventMode = 'static';
 
-      // Add the listener
       app.stage.on('pointermove', (event) => {
         handlePointerMove(event.data.originalEvent as unknown as PointerEvent);
       });
+
       app.stage.on('mousemove', (event) => {
         handlePointerMove(event.data.originalEvent as unknown as PointerEvent);
       });
@@ -344,7 +345,8 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
         }
 
         const b2 = c.getBounds();
-        c.y = app!.canvas.height - b2.height * 1.5;
+        // Use logical canvas height (accounting for resolution) to position candles at bottom
+        c.y = canvasHeight + b2.height * 0.2;
       });
 
       // layoutCandles();
@@ -355,7 +357,7 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
       let litCount = 0;
 
       candlesRef.current.forEach((c) => {
-        c.onTick(ticker, pointer);
+        c.onTick(ticker, pointer, wind.current);
         flameBursts += c.flameBursts.length;
         litCount += c.isLit ? 1 : 0;
       });
@@ -367,30 +369,49 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
 
       if (litCount === candlesRef.current.length && !allCandlesLit) {
         allCandlesLit = true;
-        gsap.to(girlBg.anim, {
-          brightness: 1,
-          duration: 2,
-          ease: 'power2.out',
-          onUpdate: updateGirlBg,
-          onComplete: () => {
-            candlesRef.current.forEach((c) => {
-              c.isLit = false;
-            });
-            allCandlesLit = false;
 
-            // Trigger the onComplete callback when candles are blown out
-            if (onComplete) {
-              onComplete();
-            }
+        const t1 = gsap.timeline();
 
-            gsap.to(girlBg.anim, {
-              brightness: 0,
-              duration: 1,
-              ease: 'power2.out',
-              onUpdate: updateGirlBg
-            });
-          }
+        t1.to(girlBg.anim, { brightness: 1, duration: 1, ease: 'power2.out', onUpdate: updateGirlBg });
+
+        // animate wind to blow out candles
+        t1.to(wind, { current: 3, duration: 0.3, ease: 'power2.out' }, '-=0.5');
+
+        t1.call(() => {
+          candlesRef.current.forEach((c) => (c.isLit = false));
+          allCandlesLit = false;
+          litCount = 0;
+          wind.current = 0; // Reset wind after blowing out candles
         });
+
+        t1.to(girlBg.anim, { brightness: 0, duration: 1, ease: 'power2.out', onUpdate: updateGirlBg });
+
+        t1.call(() => onComplete?.());
+
+        // gsap.to(girlBg.anim, {
+        //   brightness: 1,
+        //   duration: 2,
+        //   ease: 'power2.out',
+        //   onUpdate: updateGirlBg,
+        //   onComplete: () => {
+        //     candlesRef.current.forEach((c) => {
+        //       c.isLit = false;
+        //     });
+        //     allCandlesLit = false;
+
+        //     // Trigger the onComplete callback when candles are blown out
+        //     if (onComplete) {
+        //       onComplete();
+        //     }
+
+        //     gsap.to(girlBg.anim, {
+        //       brightness: 0,
+        //       duration: 1,
+        //       ease: 'power2.out',
+        //       onUpdate: updateGirlBg
+        //     });
+        //   }
+        // });
       } else if (litCount < candlesRef.current.length && allCandlesLit) {
         allCandlesLit = false;
       }

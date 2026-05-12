@@ -27,5 +27,4 @@ export interface CandleAnimationProps {
  * Copy them to your public folder:
  * cp node_modules/@drivej/candle-animation/assets/* public/
  */
-export default function CandleAnimation({ numCandles, //
-girlImage, cakeImage, candleImage, backgroundColor, width, height, scale, onComplete }: CandleAnimationProps): import("react/jsx-runtime").JSX.Element;
+export default function CandleAnimation({ numCandles, girlImage, cakeImage, candleImage, backgroundColor, width, height, scale, onComplete }: CandleAnimationProps): import("react/jsx-runtime").JSX.Element;

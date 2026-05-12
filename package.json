@@ -1,6 +1,6 @@
 {
   "name": "@drivej/candle-animation",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Interactive birthday candle animation with PixiJS and React",
   "type": "module",
   "main": "./dist/candle-animation.umd.js",
