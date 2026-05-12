@@ -431,7 +431,6 @@ export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png
       // Calculate target number of candles based on canvas width
       // Use approximately 250px per candle as spacing
       const targetCount = Math.min(5, Math.max(1, Math.floor(app.canvas.width / 250)));
-      console.log({ targetCount });
 
       if (candlesRef.current.length < targetCount) {
         // Add candles
