@@ -165,34 +165,28 @@ class FlameBurstsContainer extends PIXI.Container {
  * Copy them to your public folder:
  * cp node_modules/@drivej/candle-animation/assets/* public/
  */
-export default function CandleAnimation({
-  numCandles = 7, //
-  girlImage = '/girl.png',
-  cakeImage = '/cake.png',
-  candleImage = '/candle.png',
-  backgroundColor = '#000000',
-  width = '100%',
-  height = '100vh',
-  scale = 1.4,
-  onComplete
-}: CandleAnimationProps) {
+export default function CandleAnimation({ numCandles = 7, girlImage = '/girl.png', cakeImage = '/cake.png', candleImage = '/candle.png', backgroundColor = '#000000', width = '100%', height = '100vh', scale = 1.4, onComplete }: CandleAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
+  const candlesRef = useRef<Candle[]>([]);
+  const texturesRef = useRef<{
+    candleBg: PIXI.Texture | null;
+    blurryTexture: PIXI.Texture | null;
+    flameGlowTexture: PIXI.Texture | null;
+  }>({ candleBg: null, blurryTexture: null, flameGlowTexture: null });
+  // const {width:windowWidth} = useWindowSize();
 
+  // Initialize PIXI app only once
   useEffect(() => {
     if (!containerRef.current) return;
 
     let app: PIXI.Application | null = null;
     let isInitialized = false;
     let isCancelled = false;
-    const candles: Candle[] = [];
     const pointer: PointerState = { x: 0, y: 0, offset: { x: 0, y: 0 } };
     let allCandlesLit = false;
     let girlBg: PIXI.Sprite & { anim: AnimState };
     let cakeBg: PIXI.Sprite;
-    let candleBg: PIXI.Texture;
-    let blurryTexture: PIXI.Texture;
-    let flameGlowTexture: PIXI.Texture;
 
     // Utility function
 
@@ -237,46 +231,61 @@ export default function CandleAnimation({
       const candle_img = await PIXI.Assets.load<PIXI.Texture>(candleImage);
       if (isCancelled) return;
 
-      candleBg = candle_img;
+      texturesRef.current.candleBg = candle_img;
 
       // Create shared textures
       const flameBody = new PIXI.Graphics().circle(0, 0, 25).fill(0xffffff);
-      blurryTexture = app.renderer.generateTexture(flameBody);
+      texturesRef.current.blurryTexture = app.renderer.generateTexture(flameBody);
 
       // Create radial gradient for flame glow
       const flameGlow = new PIXI.Graphics().circle(0, 0, 20).fill({
         color: 0xffff33,
         alpha: 0.5
       });
-      flameGlowTexture = app.renderer.generateTexture(flameGlow);
+      texturesRef.current.flameGlowTexture = app.renderer.generateTexture(flameGlow);
 
-      // Create candles
-      numCandles = ~~(app!.canvas.width / 250);
-      for (let i = 0; i < numCandles; i++) {
-        addCandle();
-      }
+      // Initial candles will be created by handleResize
+      // which is called from updateLayout
 
       // Auto-light one candle after 3 seconds
       setTimeout(() => {
-        const i = candles.findIndex((c) => c.isLit);
-        if (i === -1 && candles.length > 0) {
-          candles[Math.floor(Math.random() * candles.length)].isLit = true;
+        const i = candlesRef.current.findIndex((c) => c.isLit);
+        if (i === -1 && candlesRef.current.length > 0) {
+          candlesRef.current[Math.floor(Math.random() * candlesRef.current.length)].isLit = true;
         }
       }, 3000);
 
-      updateLayout();
+      // This will create the initial candles based on canvas width
+      handleResize();
       app.ticker.add(onTick);
       isInitialized = true;
+
+      app.stage.eventMode = 'static';
+
+      // Add the listener
+      app.stage.on('pointermove', (event) => {
+        handlePointerMove(event.data.originalEvent as unknown as PointerEvent);
+      });
+      app.stage.on('mousemove', (event) => {
+        handlePointerMove(event.data.originalEvent as unknown as PointerEvent);
+      });
+
+      return app;
     };
 
     const addCandle = (): Candle => {
       if (!app) throw new Error('PIXI app not initialized');
+      const { candleBg, blurryTexture, flameGlowTexture } = texturesRef.current;
+      if (!candleBg || !blurryTexture || !flameGlowTexture) {
+        throw new Error('Textures not loaded');
+      }
       const c = new Candle({ blurryTexture, candleBg, flameGlowTexture });
       app.stage.addChild(c);
-      candles.push(c);
+      candlesRef.current.push(c);
       c.interactive = true;
       c.cursor = 'pointer';
-      c.on('click', () => {
+      c.on('pointerdown', () => {
+        console.log('Candle clicked:', c);
         c.isLit = !c.isLit;
       });
       return c;
@@ -286,30 +295,6 @@ export default function CandleAnimation({
       const b = girlBg.anim.brightness * 256;
       girlBg.tint = new PIXI.Color({ r: b, g: b, b: b }).toNumber();
     };
-
-    // const layoutCandles = (): void => {
-    //   if (!cakeBg || !app) return;
-
-    //   const canvasWidth = app.canvas.width / app.renderer.resolution;
-    //   const centerX = canvasWidth / 2;
-    //   const centerY = cakeBg.y + cakeBg.height * 0.27;
-    //   const RAD = Math.PI / 180;
-    //   const aOffset = 0;
-    //   const step = 360 / candles.length;
-    //   const rX = cakeBg.width * 0.3;
-    //   const rY = cakeBg.height * 0.15;
-
-    //   candles.forEach((c, i) => {
-    //     const a = aOffset + step * i;
-    //     c.x = centerX + Math.sin(a * RAD) * rX;
-    //     c.y = centerY + Math.cos(a * RAD) * rY;
-    //     c.zIndex = c.y;
-
-    //     const sp = app!.canvas.width / (candles.length + 1);
-    //     c.x = sp + sp * i; //
-    //     c.y = cakeBg.y + cakeBg.height * 0.47;
-    //   });
-    // };
 
     const updateLayout = (): void => {
       if (!girlBg || !cakeBg || !app) return;
@@ -329,29 +314,37 @@ export default function CandleAnimation({
       girlBg.x = canvasWidth / 2;
       girlBg.y = canvasHeight * 0.5; // * 0.4; // Proportional to height
       // girlBg.scale.set(1 * scale * autoScale);
-      girlBg.scale.set(1 * 1024 / canvasHeight);
+      girlBg.scale.set((1 * 1024) / canvasHeight);
 
       cakeBg.x = canvasWidth / 2;
       cakeBg.y = canvasHeight * 0.75; // Proportional to height
       cakeBg.scale.set(2 * scale * autoScale);
 
-      const sp = app!.canvas.width / (candles.length + 1);
+      // Calculate horizontal spacing with padding
+      // const paddingPercent = 0.1; // 10% padding on each side
+      // const padding = canvasWidth * paddingPercent;
+      // const availableWidth = canvasWidth - (padding * 2);
+      const numCandles = candlesRef.current.length;
 
+      // Distribute candles evenly across available width
+      // const spacing = numCandles > 1 ? availableWidth / (numCandles - 1) : 0;
+      const spacing = canvasWidth / (numCandles + 1); // Alternative: equal spacing across entire width
+      const padding = spacing;
 
-      // Update candle scales
-      candles.forEach((c, i) => {
-        // c.scale.set(0.7 * scale * autoScale);
-        // c.scale.set(1);
+      // Update candle scales and positions
+      candlesRef.current.forEach((c, i) => {
         const b = c.getLocalBounds();
-        // console.log(b.width, b.height, canvasHeight, (0.5 * canvasHeight) / b.height);
         c.scale.set((0.6 * canvasHeight) / b.height);
-        c.x = (sp) + (sp * i); //
-        const b2 = c.getBounds();
-        c.y = app!.canvas.height + (b2.height * 0.2);//app!.canvas.height; // * 0.5; // + 40;
-        // console.log(c.getBounds());
-        // c.x = 50;
-        // c.y = 50;
 
+        // Position candles evenly with padding
+        if (numCandles === 1) {
+          c.x = canvasWidth / 2; // Center single candle
+        } else {
+          c.x = padding + spacing * i; // Distribute multiple candles
+        }
+
+        const b2 = c.getBounds();
+        c.y = app!.canvas.height - b2.height * 1.5;
       });
 
       // layoutCandles();
@@ -361,18 +354,18 @@ export default function CandleAnimation({
       let flameBursts = 0;
       let litCount = 0;
 
-      candles.forEach((c) => {
+      candlesRef.current.forEach((c) => {
         c.onTick(ticker, pointer);
         flameBursts += c.flameBursts.length;
         litCount += c.isLit ? 1 : 0;
       });
 
-      const brightness = 256 * Math.max(0.2, Math.min(1, flameBursts / (20 * candles.length)));
+      const brightness = 256 * Math.max(0.2, Math.min(1, flameBursts / (20 * candlesRef.current.length)));
       if (cakeBg) {
         cakeBg.tint = new PIXI.Color({ r: brightness, g: brightness, b: brightness }).toNumber();
       }
 
-      if (litCount === candles.length && !allCandlesLit) {
+      if (litCount === candlesRef.current.length && !allCandlesLit) {
         allCandlesLit = true;
         gsap.to(girlBg.anim, {
           brightness: 1,
@@ -380,7 +373,7 @@ export default function CandleAnimation({
           ease: 'power2.out',
           onUpdate: updateGirlBg,
           onComplete: () => {
-            candles.forEach((c) => {
+            candlesRef.current.forEach((c) => {
               c.isLit = false;
             });
             allCandlesLit = false;
@@ -398,7 +391,7 @@ export default function CandleAnimation({
             });
           }
         });
-      } else if (litCount < candles.length && allCandlesLit) {
+      } else if (litCount < candlesRef.current.length && allCandlesLit) {
         allCandlesLit = false;
       }
     };
@@ -412,18 +405,40 @@ export default function CandleAnimation({
     };
 
     const handleResize = (): void => {
+      if (!app) return;
+
+      // Calculate target number of candles based on canvas width
+      // Use approximately 250px per candle as spacing
+      const targetCount = Math.min(5, Math.max(1, Math.floor(app.canvas.width / 250)));
+      console.log({ targetCount });
+
+      if (candlesRef.current.length < targetCount) {
+        // Add candles
+        const toAdd = targetCount - candlesRef.current.length;
+        for (let i = 0; i < toAdd; i++) {
+          addCandle();
+        }
+      } else if (candlesRef.current.length > targetCount) {
+        // Remove candles
+        const toRemove = candlesRef.current.length - targetCount;
+        for (let i = 0; i < toRemove; i++) {
+          const c = candlesRef.current.pop();
+          if (c) {
+            app.stage.removeChild(c);
+            c.destroy();
+          }
+        }
+      }
+
       updateLayout();
     };
 
-    window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('resize', handleResize);
-
     initPixi();
 
     // Cleanup
     return () => {
       isCancelled = true;
-      window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('resize', handleResize);
       if (app && isInitialized) {
         try {
@@ -433,7 +448,18 @@ export default function CandleAnimation({
         }
       }
     };
-  }, [numCandles, girlImage, cakeImage, candleImage, backgroundColor, width, height, scale]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only initialize once
+
+  // Update candles when numCandles prop changes
+  useEffect(() => {
+    if (!appRef.current) return;
+
+    // Trigger resize to adjust candle count
+    if (candlesRef.current.length !== numCandles) {
+      window.dispatchEvent(new Event('resize'));
+    }
+  }, [numCandles]);
 
   return (
     <div
